@@ -204,15 +204,27 @@ compile_epmd_module() ->
       "register_node(Name, Port, _Family) ->
          register_node(Name, Port).",
       "port_please(Name, _IP) ->
-         Port = 4370, %%ekka_dist:port(Name),
-         {port, Port, 5}.",
+         Port = dist_port(Name),
+         Version = 5,
+         {port, Port, Version}.",
       "port_please(Name, IP, _Timeout) ->
          port_please(Name, IP).",
       "names() ->
          {ok, H} = inet:gethostname(),
          names(H).",
       "names(_Hostname) ->
-         {error, address}."
+         {error, address}.",
+      "dist_port(Name) when is_atom(Name) ->
+         dist_port(atom_to_list(Name));
+       dist_port(Name) when is_list(Name) ->
+         NodeName = re:replace(Name, \"@.*$\", \"\"),
+         Offset =
+           case re:run(NodeName, \"[0-9]+$\", [{capture, first, list}]) of
+             nomatch -> 0;
+             {match, [OffsetAsString]} ->
+               list_to_integer(OffsetAsString)
+             end,
+         4370 + Offset."
     ]).
 
 compile(Exprs) ->
