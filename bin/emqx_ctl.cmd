@@ -23,15 +23,15 @@
 @set progname=erl.exe
 @set escript="%bindir%\escript.exe"
 @set nodetool="%rel_root_dir%\bin\nodetool"
+@set node_type="-name"
 
 :: Extract node name from emqx.conf
-@for /f "usebackq tokens=1-2" %%I in (`findstr /b "node.name=" "%emqx_conf%"`) do @(
-  @set node_type="-name"
+@for /f "usebackq delims=\= tokens=2" %%I in (`findstr /b node\.name "%emqx_conf%"`) do @(
   @call :set_trim node_name %%I
 )
 
-:: Extract cookie from vm.args
-@for /f "usebackq tokens=1-2" %%I in (`findstr /b "node.cookie=" "%emqx_conf%"`) do @(
+:: Extract node cookie from emqx.conf
+@for /f "usebackq delims=\= tokens=2" %%I in (`findstr /b node\.cookie "%emqx_conf%"`) do @(
   @call :set_trim node_cookie= %%I
 )
 
