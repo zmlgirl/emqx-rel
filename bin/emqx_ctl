@@ -58,7 +58,7 @@ fi
 # Extract cookie name from COOKIE_ARG
 COOKIE="$(echo "$COOKIE_ARG" | awk '{print $2}')"
 
-if [ -z "$START_EPMD" ]; then
+if [ -z "$WITHOUT_EPMD" ]; then
     EPMD_ARG="-start_epmd false -epmd_module nodetool_epmd"
 else
     EPMD_ARG="-start_epmd true"

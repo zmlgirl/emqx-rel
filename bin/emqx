@@ -239,7 +239,7 @@ fi
 COOKIE="$(echo "$COOKIE_ARG" | awk '{print $2}')"
 
 # Distribution with empd?
-if [ -z "$START_EPMD" ]; then
+if [ -z "$WITHOUT_EPMD" ]; then
     EPMD_ARG="-start_epmd false -epmd_module ekka_epmd -proto_dist ekka"
 else
     EPMD_ARG="-start_epmd true"
