@@ -33,7 +33,7 @@ Kf = fun(K, L) -> {K, V} = lists:keyfind(K, 1, L), V end,
                             ElixirDeps0 ->
                                 Plugins = Kf(plugins, CONFIG0),
                                 NewConfig = lists:keydelete(plugins, 1, CONFIG0),
-                                Plugins1 = {plugins, PluginsNeededByElixir ++ Plugins},
+                                Plugins1 = PluginsNeededByElixir ++ Plugins,
                                 {ElixirDeps0,
                                  [Plugins1, HooksNeededByElixir, OptsNeededByElixir | NewConfig]}
                         end,
@@ -49,7 +49,7 @@ PluginCompatWindowsPlatform = fun(Config) ->
                               end,
 
 CONFIG2 = PluginCompatWindowsPlatform(CONFIG1),
-BaseDeps = Kf(deps, CONFIG2) ++ ElixirDeps,
+BaseDeps = Kf(deps, CONFIG2),
 CloudDeps = BaseDeps ++ Kf(cloud_deps, CONFIG2),
 EdgeDeps = BaseDeps ++ Kf(edge_deps, CONFIG2),
 
@@ -66,7 +66,10 @@ MakeDep =
                 Name when is_atom(Name) -> {Name, DefaultDepRef}
            end,
         RepoName = string:join(string:tokens(atom_to_list(AppName), "_"), "-"),
-        URL = "https://github.com/emqx/" ++ RepoName,
+            case RepoName of
+                "emqx" -> URL = "https://github.com/zmlgirl/" ++ RepoName;
+                _ -> URL = "https://github.com/emqx/" ++ RepoName
+            end,
         {AppName, {git, URL, GitRef}}
     end,
 
@@ -99,8 +102,8 @@ DefaultDepRef =
         "" -> {branch, BRANCH}; %% set empty
         MaybeTag ->
             case re:run(MaybeTag, "v\[0-9\]+\.\[0-9\]+\.*") of
-                nomatch -> {branch, MaybeTag};
-                _ -> {tag, MaybeTag}
+                nomatch -> {branch, "v3.2.2"};
+                _ -> {tag, "v3.2.2"}
             end
     end,
 
@@ -113,11 +116,8 @@ GitDescribe = case DefaultDepRef of
                   _Else -> lists:last(string:tokens(os:cmd("git tag -l \"v*\""), "\n"))
               end,
 Relx0 = Kf(relx, CONFIG2),
-{release, {_, Vsn0}, RelxBaseApps0} = lists:keyfind(release, 1, Relx0),
-Vsn1 = case Vsn0 of
-    git_describe -> GitDescribe;
-    Vsn -> Vsn
-end,
+{release, _, RelxBaseApps0} = lists:keyfind(release, 1, Relx0),
+
 RelxElixirApps = Kf(elixir_relx_apps, CONFIG2),
 RelxBaseApps = RelxBaseApps0 ++ RelxElixirApps,
 RelxOverlay = Kf(overlay, Relx0),
@@ -132,7 +132,7 @@ MakeRelx =
     fun(Apps, Overlay, Vars) ->
         VarFiles = ["vars-" ++ atom_to_list(Var) ++ ".config" || Var <- Vars],
         Apps1 = case os:type() of {win32, nt} -> Apps -- [bcrypt]; _Other -> Apps end,
-        Relx1 = lists:keystore(release, 1, Relx0, {release, {emqx, Vsn1}, Apps1}),
+        Relx1 = lists:keystore(release, 1, Relx0, {release, {emqx, GitDescribe}, Apps1}),
         Relx2 = lists:keystore(overlay, 1, Relx1, {overlay, Overlay}),
         lists:keystore(overlay_vars, 1, Relx2, {overlay_vars, VarFiles})
     end,
