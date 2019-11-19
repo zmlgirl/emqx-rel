@@ -19,28 +19,28 @@ https://www.rebar3.org/docs/getting-started#section-installing-from-source
 ## Build on Linux/Unix/Mac
 
 ```
-git clone https://github.com/emqx/emqx-rel.git emqx-rel
+git clone https://github.com/zmlgirl/emqx-rel.git emqx-rel
 cd emqx-rel && make
 ./_build/emqx/rel/emqx/bin/emqx console
 ```
 
 ## Build rpm or deb package on Linux
 ```
-git clone https://github.com/emqx/emqx-rel.git emqx-rel
+git clone https://github.com/zmlgirl/emqx-rel.git emqx-rel
 cd emqx-rel && make emqx-pkg
 ls _packages/emqx
 ```
 
 ## Build docker image
 ```
-git clone https://github.com/emqx/emqx-rel.git emqx-rel
+git clone https://github.com/zmlgirl/emqx-rel.git emqx-rel
 cd emqx-rel && make emqx-docker-build
 ```
 
 ## Build on Windows
 
 ```
-git clone https://github.com/emqx/emqx-rel.git emqx-rel
+git clone https://github.com/zmlgirl/emqx-rel.git emqx-rel
 cd emqx-rel
 make
 cd _build\emqx\rel\emqx
